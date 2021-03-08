@@ -16,9 +16,10 @@
     </style>
     <script>
         var x = 0; //우주선의 x좌표를 결정할 변수
+        var y = 0;
         //문서 내의 hero 요소의 left 값을 변경시키자! + 좌표 정보도 갱신
         function move() {
-            x+=10; //x는 기존x에 10을 더하시오 ==10씩 누적
+            x+=50; //x는 기존x에 10을 더하시오 ==10씩 누적
             // h1 태그 안 쪽에 좌표 텍스트 출력
             document.querySelector("h1").innerText = "x값: " + x;
 
@@ -28,7 +29,7 @@
 
             //500에 도달했을 때는 우주선의 좌표가 감소되어야 한다..
             //또한 다시 0에 도달하면, 우주선의 좌표는 증가되어야 한다..
-            //힌트 삼항연산자 + % 를 이용하자!
+            //힌트 삼항연산자 + % 를 이용하자! 
 
         }
     </script>
@@ -36,7 +37,7 @@
 
 <body>
     <button onclick="move()">수동으로 이동</button>
-    <h1>x값: 50</h1>
+    <h1>x값: 0</h1>
     <img id="hero" src="../images/plane.png" width="50px">
 </body>
 
