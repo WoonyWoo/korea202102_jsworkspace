@@ -1,0 +1,14 @@
+<script>
+    var n = 0;
+
+    while(n<2 || isNaN(n)){
+        n = prompt("원하는 단을 입력하세요");
+    }
+
+    for(i=n;i>=2;i--){
+        document.write(i + "단----------<br>")
+        for(var j=1;j<=9;j++){
+            document.write(i + "*" + j + "=" + i*j + "<br>");
+        }
+    }
+    </script>

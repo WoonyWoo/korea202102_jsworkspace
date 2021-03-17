@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+#banner-frame{
+    width: 415px;
+    height: 110px;
+    background: red;
+    margin: auto;
+    padding-top: 5px;
+    box-sizing: border-box; /* padding, margin에 영향을 받지 않음 */
+    position: relative; /* 자식 때문에 */
+}
+</style>
+<script>
+var bannerFrame; //모든 함수에서 접근하기 위해
+var gap = 5; //이미지간 간격
+
+function init(){
+    bannerFrame = document.getElementById("banner-frame");
+    createProduct();
+}
+function createProduct(){
+    //액자 안에 제품 이미지 8개를 동적으로 생성하여 위치시켜본다!!
+    for(var i=0;i<8;i++){
+        var img = document.createElement("img");// <img>
+        img.src="../images/toy/toy"+i+".jpg"; //<img src="">와 동일
+        img.style.width=100+"px";
+        img.style.height=100+"px"; //크기 조정(100 x 100)
+        img.style.position="absolute";
+        img.style.left=i*(100+gap)+"px";
+
+        bannerFrame.appendChild(img); //배너에 이미지 부착
+    }
+}
+
+//생성된 이미지들 움직이기
+function move(){
+
+}
+
+window.addEventListener("load", function(){
+    init();
+});
+</script>
+</head>
+<body>
+    <div id="banner-frame"></div>
+</body>
+</html>

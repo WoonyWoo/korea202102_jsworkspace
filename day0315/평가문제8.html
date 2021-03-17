@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+</head>
+<script>
+function createTable(){
+    var floor = 0;
+    var ho = 0;
+
+    while(floor<1 || isNaN(floor)){
+        floor = parseInt(prompt("원하는 층 수를 입력하세요"));
+    }
+    while(ho<1 || isNaN(ho)){
+        ho = parseInt(prompt("원하는 호 수를 입력하세요"));
+    }
+
+    var table = document.createElement("table");
+    table.border = 1 + "px";
+    table.width = 500 + "px";
+
+    for(var i=floor;i>0;i--){
+        var tr = document.createElement("tr");
+        for(var j=1;j<=ho;j++){
+            var td = document.createElement("td");
+            td.innerText = i + "0" + j + "호";
+            td.style.textAlign = "center";
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+    }
+
+    document.body.appendChild(table);
+
+}
+
+window.addEventListener("load", function(){
+    createTable();
+});
+</script>
+<body>
+    
+</body>
+</html>
