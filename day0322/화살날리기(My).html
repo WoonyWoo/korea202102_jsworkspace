@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<script src="../js/lib.js"></script>
+<script>
+var span=[];
+
+
+function init(){
+    var vel = 10;
+    span[0] = hwasal(100,"●","red");
+    span[1] = hwasal(150,"★","orange");
+    span[2] = hwasal(200,"■","yellow");
+    span[3] = hwasal(250,"◆","green");
+    span[4] = hwasal(300,"→","blue");
+    span[5] = hwasal(350,"♬","navy");
+    span[6] = hwasal(400,"☎","purple");
+    for(var i=0;i<7;i++){
+        document.body.appendChild(span[i]);
+        setInterval("move(span["+i+"],"+vel+")",100);
+        vel+=2;
+    }
+}
+
+function hwasal(y,form,cl){
+    var sp = document.createElement("span");
+    sp.style.position = "absolute";
+    sp.style.left = 0 + "px";
+    sp.style.top = y + "px";
+    sp.innerText = form;
+    sp.style.fontSize=20+"px";
+    sp.style.color = cl;
+    return sp;
+}
+
+function move(sp, velX){
+    var x = parseInt(sp.style.left);
+    x = x + velX; //x=x+10 즉 10씩 누적
+    sp.style.left=x+"px";
+}
+window.addEventListener("load", function(){
+    init();
+    
+});
+
+
+
+</script>
+</head>
+<body>
+</body>
+</html>

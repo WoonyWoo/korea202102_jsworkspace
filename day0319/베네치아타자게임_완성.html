@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+#wrapper{
+    width:1200px;
+    height:600px;
+    background-color: yellowgreen;
+    margin: auto;
+    overflow: hidden;
+}    
+#dashBoard{
+    width:200px;    
+    height:100%;
+    background-color: aqua;
+    float:left;
+}
+#content{
+    width:1000px;
+    height:100%;
+    background-color: burlywood;
+    float:left;
+    position: relative; /*span 단어 자식 때문에*/
+    background-image: url(../images/mt.jpg);
+    background-size: cover;
+}
+#dashBoard input{
+    width:95%;
+    font-size:20px;
+    background-color: dodgerblue;
+    color:white;
+    font-weight: bold;
+}
+#hpBox{
+    width:100%;
+    height:190px;
+    margin-top:50px;
+    box-sizing: border-box;
+    padding:4px 2px 2px 2px; /*left  top  right  bottom*/
+}
+#scoreArea{
+    font-size:60px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 100px;
+}
+#content span{
+    border-radius: 10%;
+    padding:5px;
+}
+</style>
+<!-- src로 가져오는 script태그 안에는 로직을 짜서는 안됀다!! -->
+<script src="../js/lib.js"></script>
+<script>
+var hpBox;
+var content;
+var scoreArea;
+var keyword;
+var spanArray=[]; //단어가 10개이상되므로, span도 배열로 담자!! 한개로는 부족하다!!
+var velY=10; //몇 발자국씩 내려올지, 속도를 결정하는 변수
+var score=0; //점수를 누적시킬 전연변수
+var wordArray=[
+    ["마우스","광화문","핸드폰","지구","개구리","태풍","콘센트","자바","강아지","실로폰"],
+    ["사과","바나나","파인애플","참외","멜론","수박","오렌지","귤","키위","배"],
+    ["대한민국","북한","미국","영국","중국","일본","스위스","스페인","독일","노르웨이"],
+    ["데드리프트","스쿼트","벤치프레스","바벨로우","레그익스텐션","레그프레스","원암덤벨로우","펙덱플라이","싯업","풀업"]
+];
+var hpArray=[]; //hp상자들이 순서가 있어야, 차례대로 지울 수 있기 때문에 배열로 선언
+var dropFlag=true;  //게임 실행과 동시엔 단어가 낙하해야 하므로 true
+
+function init(){
+    hpBox = document.getElementById("hpBox");
+    content = document.getElementById("content");
+    scoreArea = document.getElementById("scoreArea");
+    keyword = document.getElementById("keyword");
+
+    //한자를 입력 완료하는 시점!! keyup
+    keyword.addEventListener("keyup", function(){
+        //엔터키를 누르면..단어와 입력데이터와 비교!! 
+        //console.log(event.keyCode); //C 대문자임에 주의!
+
+        if(event.keyCode==13){//엔터를 쳤을때만..
+            //게임에 등장하는 모든~!~~~단어를 대상으로 비교를 해야 하므로, 반복문으로 처리하자!!
+            for(var i=0;i<spanArray.length;i++){
+                if(spanArray[i].innerText==keyword.value){ //단어를 비교하자!!
+                    
+                    //제거함수 호출 
+                    removeObject(content, spanArray[i], spanArray, i);
+                    console.log("남은 단어의 수는 ", spanArray.length);
+                    
+                    score+=10; //10누적
+                    printScore();//점수 출력
+                }
+            }    
+            keyword.value="";//텍스트 입력 초기화!! 
+            //반복문에 의해 단어 1개가 사라질때마다 남은 단어가 있는지 여부를 체크!
+            //없으면==미션완료!!
+            checkSuccess();
+        }
+
+    });
+}   
+
+//hp상자 생성
+function createHp(){
+    //hp박스를 div로 생성해보자 (총 9개)
+    for(var i=0;i<9;i++){
+        var rect=document.createElement("div");
+        rect.style.width=60+"px";
+        rect.style.height=50+"px";
+        rect.style.backgroundColor="red";
+        rect.style.border="1px solid yellow";
+        rect.style.borderRadius=20+"%";
+        rect.style.float="left";
+        hpBox.appendChild(rect);
+        //메모리에도 순서대로 쌓아놓자!!(즉 배열에 담자 )
+        hpArray.push(rect);
+    }
+}
+
+//점수 출력을 전담하는 함수 정의
+function printScore(){
+    scoreArea.innerText=score+" 점";
+}
+
+//단어 생성하기~
+function createWord(){
+    //단어를 감싸게 될 요소의 선택 기준?  단어의 길이 만큼만 감쌀 수 있는 inline방식 중 하나를 선택하자!!
+    //span 은 단지 감싸는게 목적이고, inline방식이라서, 너비가 컨텐츠만큼만 확보된다.(wrapping  or pack)
+    var r = getRandom(wordArray.length);
+    for(var i=0;i<wordArray[r].length;i++){
+        var span = document.createElement("span");
+        span.innerText=wordArray[r][i];
+        span.style.backgroundColor="white";
+        span.style.position="absolute";  /*content div 를 기준으로 위치 지정할 예정*/  
+        span.style.left=0+(100*i)+"px";
+        //y값이 너무 일률적이면 재미가 없기때문에, 랜덤값으로 서로 다른 y 값을 부여하자!!
+        //0 ~~ -300   
+        span.style.top=-getRandom(300)+"px";
+        
+        content.appendChild(span);//화면에 부착!!
+        //지역변수인  span이 곧 죽기전에 배열에  span 엘리먼트를 담아놓자!
+        spanArray.push(span);
+    }
+}
+
+
+
+//단어 점점 내려오는 함수!!
+function dropDown(){
+    if(dropFlag){ //setInterval을 멈추려고 하지말고, 조건으로 처리하자!!
+        //한 요소만 내리지 말고, 10개모두~~한꺼번에 내리자
+        for(var i=0; i<spanArray.length;i++){ 
+            spanArray[i].style.top=parseInt(spanArray[i].style.top)+velY+ "px";
+
+            //지금 떨어지고 있는  span각자는 , 스스로 600을 넘어서고 있는지 체크해야 한다.. 
+            if(parseInt(spanArray[i].style.top) >=600){
+                //console.log(spanArray[i].innerText, " 죽으러 갑니다..안녕~~");
+                //hpArray[막내둥이] == hpArray[남아있는 배열의 마지막-1]
+                //단어스팬 제거
+                removeObject(content, spanArray[i], spanArray,i);
+                
+                //hp 는 9개이고, span은 10개일경우,  span때문에 if조건문이 한번다 실행함..
+                if(hpArray[hpArray.length-1] !=undefined){ //hp가 존재할때만 지우자!!
+                    console.log("삭제할 hp는 ", hpArray[hpArray.length-1]);
+                    removeObject(hpBox, hpArray[hpArray.length-1], hpArray, hpArray.length-1);//hp하나 제거
+                    console.log("남아있는 hp수는 ", hpArray.length);
+                }
+            }
+        }
+        
+        //hp소진에 의해 몸빵으로해결된건가? (남아있는 단어가 없나?)
+        checkSuccess();
+
+        //hp가 다 소진된건가? 배열의 길이가 0이면...게임끝
+        if(hpArray.length<=0){
+            dropFlag=false;//드랍하지 않도록 스위치 끈다!!
+            
+            if(confirm("미션실패\n게임을 다시 시도하시겠어요?")){//예 눌렀으면 게임을 처음부터 시작!!
+                location.reload(); //페이지 새로고침!!
+            }else{
+                //취소시 하고싶은 작업
+            }
+        }
+    }
+}
+
+//미션 완료 여부를 체크하는 함수 
+function checkSuccess(){
+    //남아있는 단어가 있는지 체크 즉 spanArray가 0인지...
+    //단, hp도 적어도 1개이상은 남아 있어야 성공으로 간주~!!
+    if(spanArray.length <=0 && hpArray.length>0){//까다롭게 따져보자 and연산자..
+        dropFlag=false;//dropDown이 실행되지 않게 처리...
+        alert("레벨 1단계 통과를 축하드립니다.");
+    }
+}
+
+//오브젝트 삭제 (1.화면에서 삭제   2.메모리상 삭제)
+//이 함수를 호출하는 者는 어디로부터 지울지 container를 매개변수로 넘겨줘야 함
+function removeObject(container, child, arr, index){
+    //화면에서 삭제 (부모 div로 부터 제거)
+    //부모div.removeChild(지울대상 즉 자식요소);
+    container.removeChild(child);
+    //배열에서 삭제 
+    //배열.splice(몇번째녀석, 1);
+    arr.splice(index ,1);
+}
+
+window.addEventListener("load", function(){
+    init();
+    createHp();
+    printScore();
+    createWord();
+    setInterval("dropDown()",50);
+    keyword.focus();
+});
+</script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="dashBoard">
+            <div id="hpBox"></div>
+            <input type="text" placeholder="단어입력" id="keyword">
+            <div id="scoreArea"></div>
+        </div>
+        <div id="content"></div>
+    </div>
+</body>
+</html>

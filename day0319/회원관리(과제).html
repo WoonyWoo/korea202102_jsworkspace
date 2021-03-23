@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원관리 프로그램</title>
+</head>
+<style>
+.wrapper{
+    width: 1000px;
+    height: 600px;
+    background: yellow;
+    margin: auto;
+    overflow: hidden;
+}
+#regist-area, #detail-area{
+    width: 150px;
+    height: 100%;
+    background: #ccc;
+    float: left;
+    text-align: center;
+}
+#regist-area input, #detail-area input{
+    width: 90%;
+    font-size: 18px;
+    border-radius: 5%;
+    background: dodgerblue;
+    color: white;
+    border: 1px solid white;
+}
+#list-wrapper{
+    width: 700px;
+    height: 100%;
+    float: left;
+}
+</style> 
+<script src="../js/font.js"></script>
+<script>
+var listArea; //테이블이 출력될 div 영역
+var t_id,t_name,t_phone,t_money;
+var c_id,c_name,c_phone,c_money;
+var memberArray=[]; 
+var searchMember = []; //검색된 값의 배열
+var index; //선택된 레코드의 i 값
+var searchFlag = false; //검색된 상태인지 아닌지의 flag
+
+//등록하기
+function regist(){
+    //등록전에 특히 숫자형 데이터에 대해서는 유효성 체크를 하자!!
+    if(isNaN(t_money.value)){ //참이면 숫자가 아닌것임
+        alert("자산은 숫자만 가능합니다.");
+        t_money.value="";
+        t_money.focus();
+        return; //함수 호출한 곳으로 되돌아가!!!
+    }
+
+
+    var member=[]; //비어있는 배열 선언
+    member[0] = t_id.value; //ID예정
+    member[1] = t_name.value; //Name예정
+    member[2] = t_phone.value; //Phone예정
+    member[3] = t_money.value; //Money예정
+    //한 사람의 정보가 메모리에 올라옴!!
+    console.log("지금 등록된 회원은", member);
+    //이차원 배열 용도로 선언한 memberArray에 추가하자!!
+    memberArray.push(member);
+    console.log("총 누적 회원수 ",memberArray.length);
+
+    getList(memberArray); //등록된 데이터를 표로 보여주기 위해 즉 시각화 시키기 위해 getList() 호출
+    tReset();
+    t_id.focus();
+}
+
+//좌측 Text 초기화
+function tReset(){
+    t_id.value="";
+    t_name.value="";
+    t_phone.value="";
+    t_money.value="";
+}
+
+//우측 Text 초기화
+function cReset(){
+    c_id.value="";
+    c_name.value="";
+    c_phone.value="";
+    c_money.value="";
+}
+
+//데이터를 테이블로 출력하기
+function getList(arr){ //전체 레코드와 검색된 레코드 2가지 경우의 수가 있으므로 arr 매개변수를 주어서 출력
+    var tag="<table width=\"100%\" border=\"1\">";
+    tag+="<tr style=\"background: yellowgreen\">";    
+    tag+="<td>No</td>";
+    tag+="<td>ID</td>";
+    tag+="<td>Name</td>";
+    tag+="<td>Phone</td>";
+    tag+="<td>Money</td>";                
+    tag+="</tr>"; 
+
+    var sum = 0;
+
+    //db에 있는 데이터를 이용하여 현재까지 누적된 회원의 정보를 출력하기!!
+    for(var i=arr.length-1;i>=0;i--){
+        tag+="<tr onclick='choice("+i+")'>";    //레코드가 눌리면 choice 함수 실행
+        tag+="<td>"+(i+1)+"</td>";
+        for(var j=0;j<arr[i].length;j++){
+            tag+="<td>"+arr[i][j]+"</td>";
+        }                
+        sum += parseInt(arr[i][3]);
+        tag+="</tr>";    
+    }
+    tag+="<tr>";
+    tag+="<td colspan='5' align='right'>가입 회원 수: "+arr.length+"명, 누적자산: "+sum+"원 </td>";
+    tag+="<tr>";
+    tag+="</table>";
+
+    //document.write()와 비슷하기는 하지만, document.write()는
+    //문서 전체에 지정한 문자열을 출력한다..
+    listArea.innerHTML = tag;
+}
+
+//데이터 선택 됐을 때 우측에 표시
+function choice(i){
+    index = i; //삭제와 수정에 필요한 i값 전역변수 index에 저장
+    var arr = (searchFlag)? searchMember : memberArray; //검색된 상태인지 아닌지 판별 후 그 상태에 따라서 출력
+
+    c_id.value = arr[i][0];
+    c_name.value = arr[i][1];
+    c_phone.value = arr[i][2];
+    c_money.value = arr[i][3];
+}
+
+//삭제
+function remove(){
+    if(!isEmpty(c_id.value) && !isEmpty(c_name.value) && !isEmpty(c_phone.value) && !isEmpty(c_money.value)){ //빈 값인지 물어봄
+        if(confirm("정말 삭제하시겠습니까?")){ //삭제 하기 전 한번 더 물어봄
+            if(searchFlag){ //검색된 상태라면
+                for(var i=0;i<memberArray.length;i++){ //choice()에서 얻어온 index 값은 검색되서 출력된 순서에 따른 index 이므로
+                    if(searchMember[index][0]==memberArray[i][0]){  //실제 memeberArray(원본)의 순서를 찾아서 원본의 값을 제거
+                        memberArray.splice(i,1);
+                    }
+                }
+            }else{ //검색되지 않은 상태
+                memberArray.splice(index,1);
+            }
+            cReset(); //우측 Text 초기화
+            getList(memberArray); //삭제한 후, 전체 레코드 출력
+            searchFlag = false; //검색되지 않은 상태로 바꿈
+        }
+    }
+}
+
+//수정
+function edit(){
+    if(!isEmpty(c_id.value) && !isEmpty(c_name.value) && !isEmpty(c_phone.value) && !isEmpty(c_money.value)){ //빈 값인지 물어봄
+        if(confirm("정말 수정하시겠습니까?")){ //수정하기 전에 한번 더 물어봄
+            if(searchFlag){ //검색된 상태라면
+                for(var i=0;i<memberArray.length;i++){ //choice()에서 얻어온 index 값은 검색되서 출력된 순서에 따른 index(순서) 이므로
+                    if(searchMember[index][0]==memberArray[i][0]){ //실제 memeberArray(원본)의 순서를 찾아서 원본의 값을 수정
+                        memberArray[i][0] = c_id.value;            
+                        memberArray[i][1] = c_name.value;            
+                        memberArray[i][2] = c_phone.value;            
+                        memberArray[i][3] = c_money.value; 
+                    }
+                }
+            }else{ //검색되지 않은 상태
+                memberArray[index][0] = c_id.value;            
+                memberArray[index][1] = c_name.value;            
+                memberArray[index][2] = c_phone.value;            
+                memberArray[index][3] = c_money.value;            
+            }
+            cReset(); //우측 Text 초기화
+            getList(memberArray); //수정한 후, 전체 레코드 출력
+            searchFlag = false; //검색되지 않은 상태로 바꿈
+        }
+    }
+}
+
+//검색
+function searching(){
+    searchFlag = true; //검색된 상태로 바꿈
+    searchMember = []; //검색된 값의 배열을 초기화
+
+    var selectBox = document.getElementById("selectBox"); //select
+    var searchText = document.getElementById("searchText"); //option
+
+    if(isEmpty(searchText.value)){
+        getList(memberArray);
+        searchFlag = false;
+    }else{
+        if(selectBox.value == "s_id"){ //ID로 검색
+            for(var i=0;i<memberArray.length;i++){
+                if(searchText.value == memberArray[i][0]){
+                    searchMember.push(memberArray[i]);
+                }
+            }
+        }else if(selectBox.value == "s_name"){ //이름으로 검색
+            for(var i=0;i<memberArray.length;i++){
+                if(searchText.value == memberArray[i][1]){
+                    searchMember.push(memberArray[i]);
+                }
+            }
+        }else if(selectBox.value == "s_phone"){ //핸드폰으로 검색
+            for(var i=0;i<memberArray.length;i++){
+                if(searchText.value == memberArray[i][2]){
+                    searchMember.push(memberArray[i]);
+                }
+            }
+        }else if(selectBox.value == "s_money"){ //Money로 검색
+            for(var i=0;i<memberArray.length;i++){
+                if(searchText.value == memberArray[i][3]){
+                    searchMember.push(memberArray[i]);
+                }
+            }
+        }
+
+        if(isEmpty(searchMember)){ //검색한 값과 일치 하지 않으면
+            alert("검색결과가 없습니다."); //결과가 없다고 알람
+            getList(memberArray); //지금까지 입력된 전체를 띄우고
+            searchFlag = false; //검색 상태를 false로 변경
+        }else{ 
+            getList(searchMember); //검색결과가 있으면 검색된 레코드를 출력
+        }
+    }
+}
+//빈 값 체크
+function isEmpty(val){
+    if(val=="" || val==null || val ==undefined){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function init(){
+    listArea = document.getElementById("list-area");
+    //등록용 텍스트 필드들
+    t_id = document.getElementById("t_id");
+    t_name = document.getElementById("t_name");
+    t_phone = document.getElementById("t_phone");
+    t_money = document.getElementById("t_money");
+
+    //상세보기용 텍스트 필드들
+    c_id = document.getElementById("c_id");
+    c_name = document.getElementById("c_name");
+    c_phone = document.getElementById("c_phone");
+    c_money = document.getElementById("c_money");
+
+    getList(memberArray);
+}
+
+window.addEventListener("load",function(){
+    init();
+});
+</script>
+<body>
+    <div class="wrapper">
+        <div id="regist-area">
+            <input type="text" id="t_id" placeholder="ID 입력">
+            <input type="text" id="t_name" placeholder="이름 입력">
+            <input type="text" id="t_phone" placeholder="연락처 입력">
+            <input type="text" id="t_money" placeholder="현금자산">
+            <button onclick="regist()">등록</button>
+        </div>
+        <div id="list-wrapper">
+            <div id="search-area">
+                <select id="selectBox">
+                    <option value="s_id">ID로 검색</option>
+                    <option value="s_name">이름으로 검색</option>
+                    <option value="s_phone">핸드폰으로 검색</option>
+                    <option value="s_money">Money로 검색</option>
+                </select>
+                <input type="text" id="searchText" placeholder="검색어 입력">
+                <button onclick="searching()" style='font-size:18px'>
+                    Search <i class='fas fa-search'></i></button>
+            </div>
+            <div id="list-area"></div>
+        </div>
+        <div id="detail-area">
+            <input type="text" id="c_id" placeholder="ID 입력">
+            <input type="text" id="c_name" placeholder="이름 입력">
+            <input type="text" id="c_phone" placeholder="연락처 입력">
+            <input type="text" id="c_money" placeholder="현금자산">
+            <button onclick="edit()">수정</button>
+            <button onclick="remove()">삭제</button>
+        </div>
+    </div>    
+</body>
+</html>
