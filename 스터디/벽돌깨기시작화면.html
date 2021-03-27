@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+body{
+    background: black;
+    box-sizing: border-box;
+}
+#wrapper{
+    width: 1000px;
+    height: 800px;
+    margin: 50px auto;
+    background: black;
+    border: 7px solid red;
+    text-align: center;
+}
+#title{
+    font-size: 100px;
+    color: white;
+}
+/* #content{
+    width: 400px;
+    height: 400px;
+    margin: auto;
+    border: 1px solid yellow;
+    position: relative;
+} */
+#press{
+    margin-top: 30px;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+}
+</style>
+<script src="../js/Ball2.js"></script>
+<script src="../js/lib.js"></script>
+<script>
+var wall;
+var ballColor = ["red","orange","yellow","green","blue","navy","purple"];
+var balls = [];
+var content;
+var flag = true;
+
+function init(){
+    createWall(); //벽 생성
+
+    for(var i=0;i<3;i++){ //공 3개 생성
+        createBall();
+    }
+
+    document.body.addEventListener("keydown", function(){ //아무 키 입력시 벽돌깨기 게임 화면으로 넘어감
+        location.href = "벽돌깨기.html";
+    });
+}
+
+//벽 생성
+function createWall(){
+    content = document.getElementById("content");
+    wall = document.createElement("div");
+    wall.style.width = 400 + "px";
+    wall.style.height = 400 + "px";
+    wall.style.margin = "auto";
+    wall.style.border = "1px solid yellow";
+    wall.style.position = "relative";
+
+    content.appendChild(wall);
+}
+
+//공 생성
+function createBall(){
+    var velX = getRandom(10)+1;
+    var velY = getRandom(10)+1;
+    var ball = new Ball(wall, ballColor[getRandom(ballColor.length)], 20, 20, velX, velY);
+    balls.push(ball);
+}
+
+//깜빡거림
+function blink(){
+    var press = document.getElementById("press");
+
+    if(flag){
+        press.style.color = "white";
+    }else{
+        press.style.color = "dodgerblue";
+    }
+    flag = !flag;
+
+    
+}
+
+function blinkLine(){
+    var wrapper = document.getElementById("wrapper");
+
+    for(var i=0;i<ballColor.length;i++){
+        wrapper.style.borderColor = ballColor[getRandom(ballColor.length)];
+    }
+}
+
+function gameLoop(){
+    for(var i=0;i<balls.length;i++){
+        balls[i].move();
+    }
+}
+
+window.addEventListener("load", function(){
+    init();
+    setInterval("gameLoop()", 10);
+    setInterval("blink()", 500);
+    setInterval("blinkLine()", 100);
+});
+</script>
+</head>
+<body>
+    <div id="wrapper">
+        <h1 id="title">Brick Braking</h1>
+        <div id="content"></div>
+        <div id="press">
+            Press Any Key
+        </div>
+    </div>
+</body>
+</html>
