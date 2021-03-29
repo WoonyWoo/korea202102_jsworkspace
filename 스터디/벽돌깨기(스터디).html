@@ -18,8 +18,8 @@ var targetX;
 var targetY;
 var blockArray = [];
 var colorArray = ["red","orange","yellow","green","blue","navy","purple"];
-var blockWidth = 60;
-var blockHeight = 20;
+var blockWidth = 150;
+var blockHeight = 100;
 var ball;
 var ballSize = 20;
 var ballVel = 5;
@@ -46,11 +46,12 @@ function createWall(){
 }
 
 function createBlock(){
-    var cols = (parseInt(wrapper.style.width)-4*blockWidth) / (blockWidth+gap);
-    for(var i=0;i<cols;i++){
-        // constructor(container, color, width, height, x, y)
-        blockArray[i] = new Block(wrapper, colorArray[getRandom(colorArray.length)], 
-        blockWidth,blockHeight, i*(blockWidth+gap)+blockWidth*2,100);
+    for(var i=0;i<2;i++){
+        blockArray[i] = [];
+        for(var j=0;j<2;j++){
+            // constructor(container, color, width, height, x, y)
+            blockArray[i][j] = new Block(wrapper, "red", blockWidth, blockHeight, j*blockWidth+((1000-blockWidth*2)/2), i*blockHeight+100);
+        }
     }
 }
 

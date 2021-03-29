@@ -40,6 +40,24 @@ class Ball{
             this.velX *= -1;
         }
 
+        //Bar에 닿으면 공이 튕긴다
+        var hitBar = hitTest(this.div, bar);
+        if(hitBar){
+            this.velY *= -1;
+        }
+
+        //벽돌에 닿으면 벽돌을 없애고 공은 튕겨나간다
+        for(var i=0;i<blockArray.length;i++){
+            for(var j=0;j<blockArray[i].length;j++){
+                var hitResult = hitTest(this.div, blockArray[i][j].div);
+
+                if(hitResult){
+                    removeObject(this.container, blockArray[i][j].div, blockArray[i], j);
+                    this.velY = -this.velY;
+                }
+            }
+        }
+
 
         this.div.style.left = this.x + "px";
         this.div.style.top = this.y + "px";

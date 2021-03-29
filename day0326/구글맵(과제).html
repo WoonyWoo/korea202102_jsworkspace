@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../js/store.js"></script>
+<script>
+var googleMap;
+var map;
+var index = 0; //전역 변수 인덱스 초기화
+
+function init() {
+
+    var mapProp= { //처음 창을 띄울 때, 구글맵이 뜨는 위도,경도,배율을 설정
+        center:new google.maps.LatLng(37.50260976253531, 127.03563783869724),
+        zoom:17,
+    };
+    map = new google.maps.Map(document.getElementById("googleMap"),mapProp);//맵을 띄움
+
+    for(var i=0;i<store.storeList.length;i++){
+        addMarker();//생성할 마커의 갯수만큼 마커 생성
+    }
+}
+
+function addMarker(){
+    var marker = new google.maps.Marker({ //마커 생성
+        position: new google.maps.LatLng(store.storeList[index].latLng.lat, store.storeList[index].latLng.lng),
+        animation: google.maps.Animation.BOUNCE,
+        icon:{
+            url: store.storeList[index].image,
+            scaledSize:new google.maps.Size(50,50)
+        }
+    }); 
+    
+    marker.setMap(map); //마커 구글 맵에 출력
+
+    var infowindow = new google.maps.InfoWindow({ //정보 메시지 생성
+        content: store.storeList[index].name + " : " + store.storeList[index].review
+    });
+
+    google.maps.event.addListener(marker,'click',function() { //마커 클릭 시, 정보 메시지 출력
+        infowindow.open(map,marker);
+    });
+    index++; //인덱스 증가
+}
+    
+window.addEventListener("load", function(){
+    googleMap = document.getElementById("googleMap");
+    init();
+});
+</script>
+</head>
+<body>
+<h1>My First Google Map</h1>
+<div id="googleMap" style="width:100%;height:600px;"></div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1u4Nt9vdZGjIsaYgUAQLm7wyYrIniKyg&callback=myMap"></script>
+
+</body>
+</html>
