@@ -1,5 +1,6 @@
-function blockHitX(me, target) {
-    //두물체간 충돌 여부 판단 
+function hitTest2(me, target) {
+    var hitSide = "";
+
     var me_x= parseInt(me.style.left);
     var me_y= parseInt(me.style.top);
     var me_width=parseInt(me.style.width);
@@ -10,38 +11,40 @@ function blockHitX(me, target) {
     var target_width=parseInt(target.style.width);
     var target_height=parseInt(target.style.height);
 
-
-    var result1=(me_x >= target_x+target_width-me_width) && (me_x <= (target_x+target_width)); //ball이 block 오른쪽에 닿을 때
-    var result2=(me_x+me_width >= target_x) && (me_x+me_width <= (target_x+me_width));  //ball이 block 왼쪽에 닿을 때
-    var result3=(me_y >= target_y) && (me_y <= (target_y+target_height));//ball이 block 아래쪽에 닿을 때
-    var result4=(me_y+me_height >= target_y) && (me_y+me_height <= (target_y+target_height));//ball이 block 위쪽에 닿을 때
+    var vx = (me_x + (me_width/2)) - (target_x + (target_width/2));
+    var vy = (me_y + (me_height/2)) - (target_y + (target_height/2));
     
-    return (result1 || result2) && (result3 || result4);
-}
-
-function blockHitY(me, target) {
-    //두물체간 충돌 여부 판단 
-    var me_x= parseInt(me.style.left);
-    var me_y= parseInt(me.style.top);
-    var me_width=parseInt(me.style.width);
-    var me_height=parseInt(me.style.height);
-
-    var target_x= parseInt(target.style.left);
-    var target_y= parseInt(target.style.top);
-    var target_width=parseInt(target.style.width);
-    var target_height=parseInt(target.style.height);
-
-
-    var result1=(me_x >= target_x) && (me_x <= (target_x+target_width)); //ball이 block 오른쪽에 닿을 때
-    var result2=(me_x+me_width >= target_x) && (me_x+me_width <= (target_x+target_width)); //ball이 block 왼쪽에 닿을 때
-    var result3=(me_y <= (target_y+target_height) && (me_y >= target_y+target_height-me.height)); //ball이 block 아래쪽에 닿았을 때
-    var result4=(me_y+me_height >= target_y) && (me_y+me_height <= (target_y+me_height)); //ball이 block 위쪽에 닿았을 때
+    var sumHalfWidth = (me_width/2) + (target_width/2);
+    var sumHalfHeight = (me_height/2) + (target_height/2);
     
-    return (result1 || result2) && (result3 || result4);
+    
+    if(Math.abs(vx)<sumHalfWidth && Math.abs(vy)<sumHalfHeight){
+        var overlapX = sumHalfWidth - Math.abs(vx);
+        var overlapY = sumHalfHeight - Math.abs(vy);
+
+        if(overlapX >= overlapY){
+            hitSide = (vy>0)? "top":"bottom";
+        }else{
+            hitSide = (vx>0)? "left":"right";
+        }
+        // console.log("이전", me.style.left,"  ", me.style.top);
+        
+
+        switch(hitSide){
+            case "top":
+                me.style.top = me_y - overlapY + "px";
+                break;
+            case "bottom":
+                me.style.top = me_y + overlapY + "px";
+                break;
+            case "left":
+                me.style.left = me_x - overlapX + "px";
+                break;
+            case "right":
+                me.style.left = me_x + overlapX + "px";
+                break;
+        }
+        // console.log("이후", me.style.left,"  ", me.style.top);
+    }
+    return hitSide;
 }
-
-
-// var result1=(me_x >= target_x) && (me_x <= (target_x+target_width)); //ball이 block 오른쪽에 닿을 때
-// var result2=(me_x+me_width >= target_x) && (me_x+me_width <= (target_x+target_width));  //ball이 block 왼쪽에 닿을 때
-// var result3=(me_y >= target_y) && (me_y <= (target_y+target_height));//ball이 block 아래쪽에 닿을 때
-// var result4=(me_y+me_height >= target_y) && (me_y+me_height <= (target_y+target_height));//ball이 block 위쪽에 닿을 때

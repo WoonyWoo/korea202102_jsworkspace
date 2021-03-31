@@ -28,40 +28,85 @@ class Ball{
 
     //공의 동작!!
     move(){
-        this.x = this.x + this.velX; //10씩 증가하는 등속도 운동
+        var opa = [];
+
+        this.x = this.x + this.velX;
         this.y = this.y + this.velY;
+        
 
         //y축의 경계에 다다르면..부호변경 
-        if(this.y >= this.limitY-this.height || this.y <= 0){ //밑바닥 or 천장에 도달하면!!!
+        if(this.y <= 0){ //밑바닥 or 천장에 도달하면!!!
             this.velY *= -1;
         }
         //x축의 경계에 다다르면..부호변경
         if(this.x >= this.limitX-this.width || this.x <= 0){
             this.velX *= -1;
         }
+    }
 
+    touchBar(){
         //Bar에 닿으면 공이 튕긴다
-        var hitBar = hitTest(this.div, bar);
-        if(hitBar){
-            this.velY *= -1;
+        var hitBar = hitTest2(this.div, bar);
+        if(hitBar=="top" || hitBar=="bottom" || hitBar=="left" || hitBar=="right"){
+            this.velY = -this.velY;
         }
+    }
 
+    touchBlock(){
         //벽돌에 닿으면 벽돌을 없애고 공은 튕겨나간다
         for(var i=0;i<blockArray.length;i++){
             for(var j=0;j<blockArray[i].length;j++){
-                var hitResult = hitTest(this.div, blockArray[i][j].div);
+                var hitResult = hitTest2(this.div, blockArray[i][j].div);
+                var opa = blockArray[i][j].div.style.opacity;
 
-                if(hitResult){
-                    removeObject(this.container, blockArray[i][j].div, blockArray[i], j);
+                if(hitResult=="left"|| hitResult=="right"){
+                    this.velX = -this.velX;
+                    blockArray[i][j].div.style.opacity = opa - 0.5;
+                }else if(hitResult=="top"|| hitResult=="bottom"){
                     this.velY = -this.velY;
+                    blockArray[i][j].div.style.opacity = opa - 0.5;
+                }                
+                if(opa==0){
+                    removeObject(this.container, blockArray[i][j].div, blockArray[i], j);
                 }
-            }
+            }   
         }
+    }
 
+    gameOver(){
+        if(this.y >= this.limitY-this.height){
+            var div = document.createElement("div");
+            div.style.fontSize = 100 + "px";
+            div.style.position = "relative";
+            div.style.top = 150 + "px";
+            div.style.color = "black";
+            div.style.fontWeight = "bold";
+            div.style.height = 600 + "px";
+            div.style.textAlign = "center";
+            div.innerHTML = "GAMEOVER <br><a href = 'javascript:location.reload()'>Retry</a>";
 
+            this.container.appendChild(div); //생성된 텍스트 div를 화면에 부착
+        }
+    }
+
+    // gameClear(){
+    //     if(){
+    //         var div = document.createElement("div");
+    //         div.style.fontSize = 100 + "px";
+    //         div.style.position = "relative";
+    //         div.style.top = 150 + "px";
+    //         div.style.color = "black";
+    //         div.style.fontWeight = "bold";
+    //         div.style.height = 600 + "px";
+    //         div.style.textAlign = "center";
+    //         div.innerHTML = "GAMECLEAR <br><a href = 'javascript:location.reload()'>Retry</a>";
+
+    //         this.container.appendChild(div); //생성된 텍스트 div를 화면에 부착
+    //     }
+    // }
+
+    tick(){
         this.div.style.left = this.x + "px";
         this.div.style.top = this.y + "px";
-        // this.r+=2;
-        // this.div.style.transform="rotate("+this.r+"deg)";
     }
 }

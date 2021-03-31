@@ -87,3 +87,11 @@ function hitTest(me, target) {
     return (result1 || result2) && (result3 || result4);
 }
 
+/* -------------------------------------------------------------
+자리수 처리 함수
+한 자리수의 경우 앞에 0붙이기
+---------------------------------------------------------------*/ 
+function getZeroString(n){
+    var result = (n>=10)? str=n:str="0"+n;
+    return result;
+}

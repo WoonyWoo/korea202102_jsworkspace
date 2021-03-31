@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+#navi{
+    width: 100%;
+    height: 100px;
+    text-align: center;
+    position: relative;
+}
+#navi span{
+    font-size: 30px;
+}
+#bt_prev, #bt_next{
+    width: 50px;
+    height: 35px;
+    background: dodgerblue;
+    color: #FFFFFF;
+    border: 0px;
+}
+#bt_prev{
+    position: absolute;
+    left: 0px;
+}
+#bt_next{
+    position: absolute;
+    right: 0px;
+}
+#day_area{
+    height: 100px;
+}
+#date_area{
+    height: 600px;
+}
+</style>
+<script src="../js/DateBox.js"></script>
+<script src="../js/lib.js"></script>
+<script>
+var cellSize = 100; //가로*세로 100인 사각형
+var wrapper;
+var dayArray=["Sun","Mon","Tue","Wed","Thur","Fri","Sat"];
+var flag = false;
+var days = 1;
+
+function init(){
+    createWrapper();
+    createDays(); //요일 박스 생성
+    createDate(); //날짜 박스 생성
+
+    getCurrentDate();//달력제목으로 오늘 날짜를 기본적으로 출력하자
+}
+
+//현재 날짜 구해오기 
+function getCurrentDate(){
+    var d = new Date();
+    var yy = d.getFullYear; //오늘의 연도
+    var mm = d.getMonth(); //오늘의 월 0부터 11까지
+
+    //출력할때는 월은 항상 +1 해서 출력
+    setTitle(yy+"년 "+getZeroString(mm+1)+"월"); //날짜 제목 출력!!
+}
+
+function createWrapper(){
+    wrapper = document.getElementById("wrapper"); //document 객체의 createElement() 메서드
+    wrapper.style.width = cellSize*7 + "px";
+    wrapper.style.height = 100+100+cellSize*6 + "px";
+    wrapper.style.background = "#cccccc";
+    wrapper.style.margin="auto";
+    wrapper.style.overflow = "hidden";
+
+    //월 선택 컨트롤러
+    // wrapper.style.textAlign="center";
+    // wrapper.innerHTML = "<h1>2021년 03월</h1>";
+}
+
+//일,월,화...박스생성
+function createDays(){
+    for(var i=0;i<dayArray.length;i++){
+        // constructor(container, width, height)
+        var box = new DateBox(document.getElementById("day_area"), cellSize, cellSize, dayArray[i], "yellow");
+    }
+}
+
+//해당월의 1일~끝일까지 날짜 박스 생성
+function createDate(){
+    for(var i=0;i<dayArray.length*6;i++){
+        if(i == getFirstDayOfMonth(2021,3)){
+            flag = true;
+        }
+
+        if(flag){
+            var dateBox = new DateBox(document.getElementById("date_area"), cellSize, cellSize, days++, "#FFFFFF");
+        }else {
+            var dateBox = new DateBox(document.getElementById("date_area"), cellSize, cellSize, "", "#FFFFFF");
+        }
+
+        if(i>27 && i%7 == getLastDate(2021,4)){
+            flag = false;
+        }
+    }
+}
+
+//달력의 날짜는 변경이 자주 일어나므로, 함수로 정의해놓겠다!!
+function setTitle(text){
+    // document.getElementById("cal_title").innerText=변수;
+}
+
+//각 월의 시작 요일을 알아야, 날짜의 시작 위치를 결정짓는다!!
+function getFirstDayOfMonth(year, month){
+    //원리: 각 월의 1일로 날짜를 조작한 후, 해당 요일을 물어보자!!
+    var d = new Date(year, month, 1); //넘겨받은 매개변수로 날짜를 조작함
+    return d.getDay(); //요일 반환!!
+}
+
+//각 월이 몇일까지 있는지(5월-31일까지, 6월-30일까지...구하기)
+//주의: 함수 호출시 7월말이 궁금할 경우, 매개변수로는 8월을 넘겨야 한다
+function getLastDate(year, month){
+    var d = new Date(year, month, 0);
+    return d.getDay(); //말일의 날짜 반환
+}
+
+window.addEventListener("load",function(){
+    init();
+});
+</script>
+</head>
+<body> 
+    <div id="wrapper">
+        <div id="navi">
+            <button id="bt_prev"></button>
+            <span id="cal_title">2021년 03월</span>
+            <button id="bt_next"></button>
+        </div>
+        <div id="day_area"></div>
+        <div id="date_area"></div>
+    </div>
+</body>
+</html>

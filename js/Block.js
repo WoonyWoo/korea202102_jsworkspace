@@ -12,7 +12,8 @@ class Block{
         this.div = document.createElement("div");
         this.div.style.backgroundColor = this.color;
         this.div.style.border = "1px solid white";
-        this.div.style.boxSizing = "borderBox";
+        this.div.style.boxSizing = "border-box";
+        this.div.style.opacity = 1;
 
         //크기
         this.div.style.width = this.width + "px";
